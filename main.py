@@ -31,5 +31,11 @@ def main():
     
     st.title('Groq VoiceBot')
 
-    if __name__ == "__main__":
+    audio_bytes = audio_recorder(text="",)
+    if audio_bytes:
+        st.audio(audio_bytes, format="audio/wav")
+        with open('audio.wav', mode='wb') as f:
+            f.write(audio_bytes)
+
+if __name__ == "__main__":
     main()

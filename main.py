@@ -55,12 +55,20 @@ def main():
     )
 
     conversational_memory_length = 5
-    st.session_state.memory = ConversationBufferWindowMemory(k=conversational_memory_length, memory_key="chat_history", return_messages=True)
-
-    memory = st.session_state.memory
 
     system_prompt = 'You are a friendly assistant.Keep your responses short'
+    greeting="Hi! How can i help you today?"
 
+    # Initialize session state for conversation history
+    if 'chat_messages' not in st.session_state:
+        st.write(greeting)
+        st.session_state.chat_messages = []  # Store individual chat messages
+
+    # Store memory in session state to persist across multiple runs
+    if 'memory' not in st.session_state:
+        st.session_state.memory = ConversationBufferWindowMemory(k=conversational_memory_length, memory_key="chat_history", return_messages=True)
+
+    memory = st.session_state.memory
 
     audio_bytes = audio_recorder(text="",)
     if audio_bytes:
@@ -68,6 +76,10 @@ def main():
         user_question = speech_to_text(audio_file_like)
 
         if user_question:
+
+            # Append user question
+            st.session_state.chat_messages.append({"role": "user", "content": user_question})
+
 
             # Construct a chat prompt template using various components
             prompt = ChatPromptTemplate.from_messages(
@@ -88,6 +100,9 @@ def main():
 
             # Get the chatbot's response
             response = conversation.predict(human_input=user_question)
+            
+            # Append assistant response
+            st.session_state.chat_messages.append({"role": "assistant", "content": response})
 
             st.write(response)
             

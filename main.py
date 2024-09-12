@@ -1,5 +1,12 @@
 import streamlit as st
 from audio_recorder_streamlit import audio_recorder
+import io
+from groq import Groq
+from decouple import config
+# from dotenv import load_dotenv
+
+groq_api_key = config("GROQ_API_KEY")
+groq_client = Groq(api_key=groq_api_key)
 
 def main():
     # Set page config
@@ -33,9 +40,21 @@ def main():
 
     audio_bytes = audio_recorder(text="",)
     if audio_bytes:
-        st.audio(audio_bytes, format="audio/wav")
-        with open('audio.wav', mode='wb') as f:
-            f.write(audio_bytes)
+        # st.audio(audio_bytes, format="audio/wav")
+        # with open('audio.wav', mode='wb') as f:
+        #     f.write(audio_bytes)
+        audio_file_like = io.BytesIO(audio_bytes)
+        user_question = speech_to_text(audio_file_like)
+        st.write(user_question)
+
+def speech_to_text(audio_bytes_io): 
+    transcription = groq_client.audio.transcriptions.create(
+        file=("audio.wav", audio_bytes_io.read()),
+        model="distil-whisper-large-v3-en",
+        response_format="json",
+        language="en",
+        )
+    return transcription.text
 
 if __name__ == "__main__":
     main()

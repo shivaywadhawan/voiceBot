@@ -12,10 +12,8 @@ from langchain_core.prompts import (
 )
 from langchain_core.messages import SystemMessage
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
-# from elevenlabs import generate, stream
 from elevenlabs import VoiceSettings,play
 from elevenlabs.client import ElevenLabs
-
 
 
 if 'groq_api_key' not in st.session_state:
@@ -56,9 +54,7 @@ def main():
     """, unsafe_allow_html=True)
     
     st.title('Groq VoiceBot')
-
-   
-
+    
     conversational_memory_length = 5
 
     system_prompt = 'You are a friendly assistant.Keep your responses short'
@@ -107,8 +103,6 @@ def main():
             # Display user question
             st.markdown(f"<div class='user-message'><strong>User:</strong> {user_question}</div>", unsafe_allow_html=True)
 
-
-
             # Construct a chat prompt template using various components
             prompt = ChatPromptTemplate.from_messages(
                 [
@@ -140,7 +134,6 @@ def main():
 
             
         
-
 def speech_to_text(audio_bytes_io): 
     transcription = groq_client.audio.transcriptions.create(
         file=("audio.wav", audio_bytes_io.read()),
@@ -151,14 +144,6 @@ def speech_to_text(audio_bytes_io):
         )
     return transcription.text
 
-# def generate_audio(text):
-#     audio_stream = generate(
-#         api_key=eleven_api_key,
-#         text=text,
-#         voice="Alice",
-#         stream=True
-#     )
-#     stream(audio_stream)
 
 def text_to_speech_stream(text: str):
     # Perform the text-to-speech conversion
@@ -185,7 +170,6 @@ def text_to_speech_stream(text: str):
 
      # Convert the BytesIO stream to bytes
     audio_data = audio_stream.getvalue()
-
     play(audio_data)
 
     

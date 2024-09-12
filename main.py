@@ -20,14 +20,17 @@ if 'groq_api_key' not in st.session_state:
     st.session_state.groq_api_key = config("GROQ_API_KEY")
     st.session_state.eleven_api_key = config("ELEVEN_API_KEY")
 
+# Api key creation
 groq_api_key = st.session_state.groq_api_key
 eleven_api_key = st.session_state.eleven_api_key
 groq_client = Groq(api_key=groq_api_key)
 elevenlabs_client = ElevenLabs(api_key=eleven_api_key,)
 
 def main():
+    
     # Set page config
     st.set_page_config(page_title='Groq voicebot', page_icon='🎤')
+
     # Custom styling
     st.markdown("""
     <style>
@@ -53,14 +56,14 @@ def main():
     </style>
     """, unsafe_allow_html=True)
     
-    st.title('Groq VoiceBot')
+    st.title('Groq voiceBot')
+
+    system_prompt = 'You are a friendly assistant.Keep your responses short'
+    greeting="Hi! How can i assist you today?"
     
     conversational_memory_length = 5
 
-    system_prompt = 'You are a friendly assistant.Keep your responses short'
-    greeting="Hi! How can i help you today?"
-
-    # Initialize the Groq model only once
+    # Initialize the Groq model
     if 'groq_chat' not in st.session_state:
         st.session_state.groq_chat = ChatGroq(
         groq_api_key=groq_api_key, 
@@ -137,7 +140,7 @@ def main():
 def speech_to_text(audio_bytes_io): 
     transcription = groq_client.audio.transcriptions.create(
         file=("audio.wav", audio_bytes_io.read()),
-        model="distil-whisper-large-v3-en",
+        model="distil-whisper-large-v3-en", # WhisperModel
         prompt="You are converting speech to text",
         response_format="json",
         language="en",
@@ -146,12 +149,11 @@ def speech_to_text(audio_bytes_io):
 
 
 def text_to_speech_stream(text: str):
-    # Perform the text-to-speech conversion
     response = elevenlabs_client.text_to_speech.convert(
         voice_id="21m00Tcm4TlvDq8ikWAM", 
         output_format="mp3_22050_32",
         text=text,
-        model_id="eleven_multilingual_v2",
+        model_id="eleven_multilingual_v2", # Eleven model
         voice_settings=VoiceSettings(
             stability=0.7,
             similarity_boost=1.0,

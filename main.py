@@ -3,8 +3,6 @@ from audio_recorder_streamlit import audio_recorder
 import io
 from groq import Groq
 from decouple import config
-
-
 from langchain.chains import LLMChain
 from langchain_groq import ChatGroq
 from langchain_core.prompts import (
@@ -14,10 +12,11 @@ from langchain_core.prompts import (
 )
 from langchain_core.messages import SystemMessage
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
-
+from elevenlabs import generate, stream
 
 groq_api_key = config("GROQ_API_KEY")
 groq_client = Groq(api_key=groq_api_key)
+eleven_api_key = config("ELEVEN_API_KEY")
 
 def main():
     # Set page config
@@ -123,6 +122,9 @@ def main():
             # Display assistant response
             st.markdown(f"<div class='assistant-message'><strong>Assistant:</strong> {response}</div>", unsafe_allow_html=True)
 
+            # Generate audio response
+            generate_audio(response)
+
             
         
 
@@ -135,6 +137,16 @@ def speech_to_text(audio_bytes_io):
         language="en",
         )
     return transcription.text
+
+def generate_audio(text):
+    audio_stream = generate(
+        api_key=eleven_api_key,
+        text=text,
+        voice="Alice",
+        stream=True
+    )
+    stream(audio_stream)
+    
 
 if __name__ == "__main__":
     main()

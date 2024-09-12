@@ -82,8 +82,6 @@ def main():
     memory = st.session_state.memory
 
     st.markdown("### Click to ask question:")
-
-
     audio_bytes = audio_recorder(text="",)
 
     # Display chat history

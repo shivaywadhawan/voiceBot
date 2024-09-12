@@ -3,7 +3,6 @@ from audio_recorder_streamlit import audio_recorder
 import io
 from groq import Groq
 from decouple import config
-# from dotenv import load_dotenv
 
 groq_api_key = config("GROQ_API_KEY")
 groq_client = Groq(api_key=groq_api_key)

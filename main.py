@@ -70,7 +70,19 @@ def main():
 
     memory = st.session_state.memory
 
+    st.markdown("### Click to ask question:")
+
+
     audio_bytes = audio_recorder(text="",)
+
+    # Display chat history
+    st.markdown("### Conversation:")
+    for message in st.session_state.chat_messages:
+        if message["role"] == "user":
+            st.markdown(f"<div class='user-message'><strong>User:</strong> {message['content']}</div>", unsafe_allow_html=True)
+        else:
+            st.markdown(f"<div class='assistant-message'><strong>Assistant:</strong> {message['content']}</div>", unsafe_allow_html=True)
+    
     if audio_bytes:
         audio_file_like = io.BytesIO(audio_bytes)
         user_question = speech_to_text(audio_file_like)
@@ -79,6 +91,10 @@ def main():
 
             # Append user question
             st.session_state.chat_messages.append({"role": "user", "content": user_question})
+
+            # Display user question
+            st.markdown(f"<div class='user-message'><strong>User:</strong> {user_question}</div>", unsafe_allow_html=True)
+
 
 
             # Construct a chat prompt template using various components
@@ -104,7 +120,9 @@ def main():
             # Append assistant response
             st.session_state.chat_messages.append({"role": "assistant", "content": response})
 
-            st.write(response)
+            # Display assistant response
+            st.markdown(f"<div class='assistant-message'><strong>Assistant:</strong> {response}</div>", unsafe_allow_html=True)
+
             
         
 

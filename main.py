@@ -14,9 +14,15 @@ from langchain_core.messages import SystemMessage
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from elevenlabs import generate, stream
 
-groq_api_key = config("GROQ_API_KEY")
+
+
+if 'groq_api_key' not in st.session_state:
+    st.session_state.groq_api_key = config("GROQ_API_KEY")
+    st.session_state.eleven_api_key = config("ELEVEN_API_KEY")
+
+groq_api_key = st.session_state.groq_api_key
+eleven_api_key = st.session_state.eleven_api_key
 groq_client = Groq(api_key=groq_api_key)
-eleven_api_key = config("ELEVEN_API_KEY")
 
 def main():
     # Set page config
@@ -48,15 +54,21 @@ def main():
     
     st.title('Groq VoiceBot')
 
-    groq_chat = ChatGroq(
-            groq_api_key=groq_api_key, 
-            model_name='llama3-8b-8192'
-    )
+   
 
     conversational_memory_length = 5
 
     system_prompt = 'You are a friendly assistant.Keep your responses short'
     greeting="Hi! How can i help you today?"
+
+    # Initialize the Groq model only once
+    if 'groq_chat' not in st.session_state:
+        st.session_state.groq_chat = ChatGroq(
+        groq_api_key=groq_api_key, 
+        model_name='llama3-8b-8192'
+    )
+
+    groq_chat = st.session_state.groq_chat
 
     # Initialize session state for conversation history
     if 'chat_messages' not in st.session_state:
